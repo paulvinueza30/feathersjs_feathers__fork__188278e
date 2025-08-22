@@ -115,3 +115,58 @@ app.service('messages').hooks({
   }
 })
 ```
+
+## Validating custom methods
+
+`schemaHooks.validateData` can also be used to validate the data of a [custom service method](../services.md#custom-methods).
+The following example shows a `send-verification` custom method on the `user` service that sends a verification email to a user.
+
+```ts
+import { Ajv, schemaHooks } from '@feathersjs/schema'
+import { Type, getValidator, querySyntax } from '@feathersjs/typebox'
+import type { Static } from '@feathersjs/typebox'
+
+import { dataValidator } from '../validators'
+import type { HookContext, NextFunction } from '../declarations'
+
+// Schema for the data we expect to receive
+const verificationSchema = Type.Object(
+  {
+    email: Type.String()
+  },
+  { $id: 'Verification', additionalProperties: false }
+)
+type Verification = Static<typeof verificationSchema>
+
+// Validator for the data
+const verificationValidator = getValidator(verificationSchema, dataValidator)
+
+// The service class
+class UserService {
+  async create (data: any) {
+    // ...
+  }
+  
+  async sendVerification (data: Verification, params: Params) {
+    return {
+      message: `Verification email sent to ${data.email}`
+    }
+  }
+}
+
+const app = express(feathers())
+
+app.use('user', new UserService(), {
+  methods: ['create', 'sendVerification']
+})
+
+const service = app.service('user')
+
+// Validate the data of the custom method
+service.hooks({
+  before: {
+    sendVerification: [schemaHooks.validateData(verificationValidator)]
+  }
+})
+```
+

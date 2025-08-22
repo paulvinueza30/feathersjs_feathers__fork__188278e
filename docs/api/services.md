@@ -240,7 +240,7 @@ When calling [app.listen](application.md#listenport) or [app.setup](application.
 
 A custom method is any other service method you want to expose publicly. A custom method **must have** the signature of `(data, params)` with the same semantics as standard service methods (`data` is the payload, `params` is the service [params](#params)). They can be used with [hooks](./hooks.md) (including authentication) and must be `async` or return a Promise.
 
-In order to register a public custom method, the names of _all methods_ have to be passed as the `methods` option when registering the service with [app.use()](./application.md#usepath-service--options)
+In order to register a public custom method, the names of _all methods_ have to be passed as the `methods` option when registering the service with [app.use()](./application.md#usepath-service--options). For more information on how to validate custom method data, see the [validators documentation](./schema/validators.md#validating-custom-methods).
 
 ```ts
 import type { Id, Params } from '@feathersjs/feathers'
